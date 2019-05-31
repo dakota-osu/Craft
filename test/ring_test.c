@@ -187,6 +187,10 @@ static CU_TestInfo ring_analysis_tests[] = {
     CU_TEST_INFO_NULL
 };
 
+
+static CU_SuiteInfo suites[] = {
+    {"ring analysis suite", NULL, NULL, NULL, NULL, ring_analysis_tests},
+
 static CU_TestInfo ring_put_tests[] = {
     {"checking block put", properly_puts_block},
     {"checking light put", properly_puts_light},

@@ -4,7 +4,12 @@
 
 #include "CUnit/Basic.h"
 #include "test_test.h"
+#include "ring_test.h"
+#include "ring_test_mutate.h"
 #include "auth_test.h"
+#include "world_test.h"
+#include "util_test.h"
+#include "matrix_test.h"
 
 #include "item_test.h"
 #include "item_test_mutant.h"
@@ -18,7 +23,11 @@ void AddAllTests() {
   InputMock_AddTests();
 
 	TestTest_AddTests();
+	RingTest_AddTests();
+	RingTestMutate_AddTests();
 	AuthTest_AddTests();
+	WorldTest_AddTests();
+	UtilTest_AddTests();
   MatrixTest_AddTests();
   RingTest_AddTests();
 	ItemTest_AddTests();
