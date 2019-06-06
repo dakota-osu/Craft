@@ -5,6 +5,12 @@
 
 void normalize(float *x, float *y, float *z) {
     float d = sqrtf((*x) * (*x) + (*y) * (*y) + (*z) * (*z));
+
+    // if statement added to prevent divide-by-zero error
+    if (d == 0) {
+	return;
+    }
+
     *x /= d; *y /= d; *z /= d;
 }
 
