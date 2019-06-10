@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "map.h"
+#include "assert.h"
 
 int hash_int(int key) {
     key = ~key + (key << 15);
@@ -20,6 +21,7 @@ int hash(int x, int y, int z) {
 }
 
 void map_alloc(Map *map, int dx, int dy, int dz, int mask) {
+    
     map->dx = dx;
     map->dy = dy;
     map->dz = dz;
@@ -29,11 +31,14 @@ void map_alloc(Map *map, int dx, int dy, int dz, int mask) {
 }
 
 void map_free(Map *map) {
+    assert(map);
+    assert(map->data);
     free(map->data);
     map->data =NULL;            //Added by Josh Strozzi, this is what it should do after freeing
 }
 
 void map_copy(Map *dst, Map *src) {
+    assert(src);
     dst->dx = src->dx;
     dst->dy = src->dy;
     dst->dz = src->dz;
@@ -44,6 +49,8 @@ void map_copy(Map *dst, Map *src) {
 }
 
 int map_set(Map *map, int x, int y, int z, int w) {
+    assert(map);
+    assert(map->data);
     unsigned int index = hash(x, y, z) & map->mask;
     x -= map->dx;
     y -= map->dy;
@@ -79,6 +86,8 @@ int map_set(Map *map, int x, int y, int z, int w) {
 }
 
 int map_get(Map *map, int x, int y, int z) {
+    assert(map);
+    assert(map->data);
     unsigned int index = hash(x, y, z) & map->mask;
     x -= map->dx;
     y -= map->dy;
@@ -98,6 +107,8 @@ int map_get(Map *map, int x, int y, int z) {
 }
 
 void map_grow(Map *map) {
+    assert(map);
+    assert(map->data);
     Map new_map;
     new_map.dx = map->dx;
     new_map.dy = map->dy;
