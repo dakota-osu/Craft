@@ -19,7 +19,7 @@
 
 static int client_enabled = 0;
 static int running = 0;
-static int sd = 0;
+static int sd = 0; // Socket of the server
 static int bytes_sent = 0;
 static int bytes_received = 0;
 static char *queue = 0;
@@ -27,18 +27,27 @@ static int qsize = 0;
 static thrd_t recv_thread;
 static mtx_t mutex;
 
+// Enables the client
 void client_enable() {
     client_enabled = 1;
 }
 
+// Disables the client
 void client_disable() {
     client_enabled = 0;
 }
 
+// Gets the status of the client
+// Return values:
+// 1: Client is enabled
+// 0: Client is disabled
 int get_client_enabled() {
     return client_enabled;
 }
 
+// Sends a string to the designated socket descriptor
+// Returns 0 upon failure or completion
+// DO NOT USE THIS FUNCTION, USE CLIENT_SEND INSTEAD
 int client_sendall(int sd, char *data, int length) {
     if (!client_enabled) {
         return 0;
@@ -56,6 +65,9 @@ int client_sendall(int sd, char *data, int length) {
     return 0;
 }
 
+// Calls the client_sendall function and handles errors for it
+// exits with a return value of 1 upon error, returns nothing otherwise
+// USE THIS ONE TO SEND DATA, NOT SENDALL
 void client_send(char *data) {
     if (!client_enabled) {
         return;
@@ -66,6 +78,7 @@ void client_send(char *data) {
     }
 }
 
+// Gets the game version of the client and sends it to the server
 void client_version(int version) {
     if (!client_enabled) {
         return;
@@ -75,6 +88,7 @@ void client_version(int version) {
     client_send(buffer);
 }
 
+// Sends the client's username and ID token to the server for authentification
 void client_login(const char *username, const char *identity_token) {
     if (!client_enabled) {
         return;
@@ -84,6 +98,9 @@ void client_login(const char *username, const char *identity_token) {
     client_send(buffer);
 }
 
+// Calculates the player's distance from the last point this function was called at
+// Initializes at the origin
+// If the player has moved more than .0001 units, send the current coordinates to the server
 void client_position(float x, float y, float z, float rx, float ry) {
     if (!client_enabled) {
         return;
@@ -104,6 +121,7 @@ void client_position(float x, float y, float z, float rx, float ry) {
     client_send(buffer);
 }
 
+// Sends the client's current chunk coordinate to the server
 void client_chunk(int p, int q, int key) {
     if (!client_enabled) {
         return;
@@ -113,6 +131,7 @@ void client_chunk(int p, int q, int key) {
     client_send(buffer);
 }
 
+// Sends the client's current block coordinate to the server
 void client_block(int x, int y, int z, int w) {
     if (!client_enabled) {
         return;
@@ -122,6 +141,7 @@ void client_block(int x, int y, int z, int w) {
     client_send(buffer);
 }
 
+// Sends the client's current light level to the server
 void client_light(int x, int y, int z, int w) {
     if (!client_enabled) {
         return;
@@ -131,6 +151,7 @@ void client_light(int x, int y, int z, int w) {
     client_send(buffer);
 }
 
+// Sends the coordinates, orientation, and contents of a sign placed by the client to the server
 void client_sign(int x, int y, int z, int face, const char *text) {
     if (!client_enabled) {
         return;
@@ -140,6 +161,7 @@ void client_sign(int x, int y, int z, int face, const char *text) {
     client_send(buffer);
 }
 
+// Sends player inputed text to the server for use in the chat
 void client_talk(const char *text) {
     if (!client_enabled) {
         return;
@@ -152,6 +174,10 @@ void client_talk(const char *text) {
     client_send(buffer);
 }
 
+// Receives data from the server in the form of a string
+// Creates a new thread for this operation
+// Returns the string received
+// Probably don't call this on its own
 char *client_recv() {
     if (!client_enabled) {
         return 0;
@@ -176,6 +202,8 @@ char *client_recv() {
     return result;
 }
 
+// Continually receives data from the server until completion
+// Pass in client_recv() to use this function
 int recv_worker(void *arg) {
     char *data = malloc(sizeof(char) * RECV_SIZE);
     while (1) {
@@ -209,6 +237,7 @@ int recv_worker(void *arg) {
     return 0;
 }
 
+// Sockets into the specified port
 void client_connect(char *hostname, int port) {
     if (!client_enabled) {
         return;
@@ -233,6 +262,7 @@ void client_connect(char *hostname, int port) {
     }
 }
 
+// Creates a new thread running the client
 void client_start() {
     if (!client_enabled) {
         return;
@@ -247,6 +277,9 @@ void client_start() {
     }
 }
 
+// Disconnects from the port and frees up data
+// NOTE: This function used to kill the thread but it doesn't anymore. It was like that when I got here
+// I wouldn't recommend changing it
 void client_stop() {
     if (!client_enabled) {
         return;
